@@ -1,0 +1,183 @@
+---
+format: markdown
+title: Laboratory4 - Public Key Cryptography : ElGamal(basic version)
+name: Catargiu Georgiana Ecaterina
+group: 932/1
+. . . 
+
+Problem number: 3
+The purpose of this laboratory is to implement the basic version of the ElGamal algorithm for encryption/decryption.
+
+Firstly, let's have a glimpse of what this algorithm is all about. 
+
+The ElGamal encryption system is an asymmetric key encryption algorithm used for public key cryptography that was first described by Taher ElGamal. An asymmetric key encryption is known as public key encryption and it is a data encryption where the encryption key(which is also known as the public key) and the decryption key(which is also known as private key) are different.
+
+An advantage of the algorithm would be that the same plaintext gives a different ciphertext (with near certainty) each time it is encrypted but as disadvantage the ciphertext is twice as long as the plaintext.
+
+The ElGamal encryption algorithm consists of 3 main components: the generation of the key, the algorithm for encryption and the algorithm for decryption which will be all described bellow one by one as presented at the course.
+
+The key generation is pretty straightforward. A key pair is generated following the steps: generate a cyclic group G of order q with the generator g. Choose a random integer from the interval [1,q-1] and then compute h as g^x. So, the public key will const of (G,q,g,h) and the private key will be the x.
+
+Then we have the encryption. We have the message M that we want to encrypt and the public key previously generated (G,q,g,h). We  map the message M to an element m from out group G using a reversible mapping function. We choose a random integer from the interval [1,q-1] and we compute the s as being h^y. Then we compute c1=g^y and c2=m*s. We will have now the ciphertext (c1,c2).
+
+The decryption is just as simple as the key generation and the encryption were. We compute s=c1^x but since c1=g^y, c1^x=g^(x*y)=h^y. We then compute s^(-1), the inverse of s in the group G. Then we have m=c2*s^(-1). This last computation will reproduce in fact the original message M because we know that c2=m*s. Hence, c2*s^(-1)=(m*s)*s^(-1)=m*e=m. 
+
+
+Proof of correctness for this algorithm will go as follows: 
+
+If (r,s) is the signature on the message M, then s = k^(−1) (h(m) – a*r)  (mod p − 1). 
+Multiplying both sides by k we get k*s = h(m) – a*r (mod p − 1),  that is, in fact  h(m) = a*r + k*s (mod p − 1). 
+This implies that α^(h(m)) = α^(a*r+k*s) = (α^a)^r* r^s (mod p). 
+Hence v1 = v2, as required.
+
+Let’s see how I chose to implement it.
+
+Firstly we need some functions that are crucial: the primality check for a number, the Miller Rabin test and the modular exponentiation.
+
+Here we have the modular exponentiation, a function that receives 3 parameters(a, b and c) as input and returns the result of (a^b)%c.
+
+<<Modular exponentiation>>=
+def modularExponentiation(a,b,c):
+    x=1
+    y=a
+    while b>0:
+        if b%2==0:
+            x=(x*y)%c
+        y=(y*y)%c
+        b=int(b/2)
+    return x%c 
+@
+
+Then we certainly need the Miller Rabin test for a number because we will generate an extremly big number and checking its primality with the gcd algorithm will take a lot of time.
+So, the algorithm will return false if the given number is composite and true if it is prime. 
+The algorithm goes as we learned at the course and as follows: first we pick a random number from the interval [2,n-2]. We need to make sure that n is bigger than 4 because otherwise it will represent a special case.
+Then, we compute the modular exponentiation of (a^d)%n and we keep squaring our nuber, x, until d reaches n-1 or (x^2)%n is 1 or (x^2)%n is not 1.
+
+<<Miller Rabin>>=
+def miillerRabinTest(d, n):
+    a = 2 + random.randint(1, n - 4);
+    x = modularExponentiation(a, d, n);
+    if (x == 1 or x == n - 1):
+        return True;
+    while (d != n - 1):
+        x = (x * x) % n
+        d *= 2
+        if (x == 1):
+            return False;
+        if (x == n - 1):
+            return True
+    return False
+@
+
+The primality check of a number happens here and it uses the previously explained Miller Rabin test. The function is prety much the one used from highschool, but with a little bit of spice.
+So, my algorithm will return false if the number is composite and true if the number is prime(probably). The bigger the level of accuracy, the better - we will see later.
+
+<<Is Prime>>=
+def isPrime(n, levelOfAccuracy):
+    if (n <= 1 or n == 4):
+        return False;
+    if (n <= 3):
+        return True;
+    d = n - 1
+    while (d % 2 == 0):
+        d //= 2
+    for i in range(levelOfAccuracy):
+        if (miillerRabinTest(d, n) == False):
+            return False
+    return True
+@
+
+
+
+Then, we generate the key. We choose a large number q and a cyclic group G. From the group we chose the elements g and a such that the primality test is passed. Then we compute h=g^a and we have F,h,q,g as public key and g as private key.
+
+<<Key generation>>=
+def keyGeneration(bound):
+    key = random.randint(pow(10,20),bound)
+    while isPrime(bound,key)==1:
+        key=random.randint(pow(10,20),bound)
+    return key
+@
+
+
+For the encryption part we select an element k from G such that gcd(k,q)=1 and then we compute p=g^a and s=h^k=g^(a*k). Then we multiply the s with M(our message). We send (p,M*s)=(g^k,M*s).
+
+
+<<Encrypt>>=
+def encrypt(message,q,h,g):
+    encrypted=[]
+    k=keyGeneration(q)
+    s=modularExponentiation(h,k,q)
+    p=modularExponentiation(g,k,q)
+    for i in range(0,len(message)):
+        encrypted.append(message[i])
+    for i in range(0,len(encrypted)):
+        encrypted[i]=s*ord(encrypted[i])
+    return encrypted,p
+@
+
+
+Finally, for the decryption all we need to do is to compute s’=p^a=g^(a*k) and to divide M*s by s’ in order to obtain M being s=s’.
+
+<<Decrypt>>=
+
+def decrypt(encrypted,p,key,q):
+    decrypted=[]
+    h=modularExponentiation(p,key,q)
+    for i in range(0,len(encrypted)):
+        decrypted.append(chr(int(encrypted[i]/h)))
+    return decrypted
+@
+
+
+That’s the simplest way to perform this kind of encryption and the method is based on the difficulty of finding discrete logarithm in a cyclic group that is even if we know g^a and g^k it is extremely difficult to compute g^(a*k).
+
+<<El Gamal>>=
+def elGamal(sequence):
+    print("Original Message: ", sequence)
+    q = random.randint(pow(10, 20), pow(10, 50))
+    g = random.randint(2, q)
+    key = keyGeneration(q)
+    h = modularExponentiation(g, key, q)
+    encrypted, p = encrypt(sequence, q, h, g)
+    #print("Encrypted Message: ", encrypted)
+    decrypted = decrypt(encrypted, p, key, q)
+    decryptedMessage = ''.join(decrypted)
+    print("Decrypted Message: ", decryptedMessage)
+@
+
+
+And here we have the main program with some testings. I chose to test the progrma with smaller and bigger chunks of text in order to be sure of the corectness of the algortihm: 
+
+<<*>>=
+<<Modular exponentiation>>
+<<Miller Rabin>>
+<<Is Prime>>
+<<Key generation>>
+<<Encrypt>>
+<<Decrypt>>
+<<El Gamal>>
+
+import random
+
+elGamal('Buna ce faci?')
+print('******************')
+elGamal('Neatza')
+print('******************')
+elGamal('Acesta este un mesaj lung si fara sens pus aici doar ca sa testez algoritmul')
+print('******************')
+elGamal('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut facilisis erat et neque dapibus, vel sodales lectus sollicitudin. Fusce finibus iaculis metus. Integer pulvinar eget lectus non rutrum. Fusce porttitor, turpis sed faucibus tristique, velit neque pellentesque nulla, id porttitor neque nisi et felis. Integer blandit dignissim aliquet. Mauris ante dolor, tincidunt id pulvinar at, interdum sit amet eros. Praesent vehicula accumsan lorem, vehicula fermentum erat faucibus in. Nullam in hendrerit dolor. Pellentesque diam velit, sagittis at neque et, venenatis egestas eros.Aliquam sollicitudin massa nisl, efficitur venenatis ante gravida non. Phasellus in tempor est. In malesuada sapien vel massa varius imperdiet. Ut mattis vulputate massa, nec cursus ante placerat sed. Donec fermentum quam et justo tempor, ac finibus nisi porta. Donec nunc quam, lobortis vitae rhoncus a, fermentum vitae velit. Pellentesque dictum, turpis ac varius lobortis, ipsum elit consectetur lorem, et consequat est urna vel orci. Proin posuere risus quam, non viverra elit tempor non. Suspendisse arcu metus, blandit at tortor vitae, sodales varius lectus. Nam dapibus mauris massa, et pellentesque ante sollicitudin vel. Mauris sed cursus erat, sed congue nulla. Nunc efficitur tortor eu mauris accumsan, at pulvinar eros ultrices. Pellentesque mauris justo, sagittis in ultricies non, pulvinar id purus. Nunc lacinia ex dui, sed dignissim est lobortis porttitor. Vivamus egestas aliquam risus a imperdiet.In hac habitasse platea dictumst. Nulla lobortis nunc vel finibus vulputate. Vestibulum commodo tempor felis a rhoncus. Ut ac elementum dui. Maecenas nec purus velit. Mauris vel ligula volutpat, faucibus ligula at, rhoncus magna. Integer sed lacinia tellus, sed sagittis ligula. Suspendisse eleifend accumsan nunc eget viverra. Ut sed pharetra libero, at venenatis nisl. Donec accumsan nisl id tortor lacinia, in finibus tellus lobortis. Morbi porttitor massa vel magna luctus, id viverra sem tincidunt. Maecenas pretium, nulla nec ultricies mollis, eros ex maximus sapien, eget pharetra felis nunc ac risus. Aliquam id hendrerit neque. Aenean convallis aliquet nulla nec dictum. Nullam sit amet pulvinar lacus, non mollis mauris. Lorem ipsum dolor sit amet, consectetur adipiscing elit.Integer porttitor iaculis lacus, eu hendrerit justo vulputate at. Vivamus sed gravida felis. Integer sed nulla interdum lacus aliquet imperdiet. Vivamus porttitor sed erat eget vulputate. Aenean at iaculis ex, laoreet ullamcorper est. Suspendisse congue convallis diam, elementum euismod nunc aliquet nec. Cras egestas est in bibendum auctor.Proin elementum velit non facilisis placerat. In non blandit nisl. Sed vulputate, metus sed scelerisque iaculis, libero tellus placerat nisi, a semper enim mi quis ex. Etiam volutpat dui mi, eu pellentesque nulla cursus euismod. Praesent malesuada, ex nec mattis molestie, eros ligula ultricies odio, nec laoreet lectus eros eget lorem. Ut non mauris ut urna consectetur laoreet. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.')
+print('******************')
+elGamal('Sequence respecting approaches have an edge over bag-of-words implementations when the said sequence is material to classification.')
+print('******************')
+elGamal('asdfghjnbvcdsdftgyhjnbvcdftgh')
+print('********************')
+elGamal('test sa vedem ca merge')
+print('*********************')
+elGamal('find an n coloring of a graph')
+print('********************')
+elGamal('simulate an n body problem')
+print('********************')
+
+@
+

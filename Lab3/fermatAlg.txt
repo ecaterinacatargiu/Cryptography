@@ -1,0 +1,117 @@
+---
+format: markdown
+title: Laboratory3 - Generalized Fermat's Algorithm
+name: Catargiu Georgiana Ecaterina
+group: 932/1
+. . .
+
+Problem number: 3
+
+The purpose of this laboratory is to implement the generalized Fermat's algorithm in order to factorize a number.
+
+But first, let's see what this Generalized Fermat's Algorithm is really about. It will take as an input an odd composite number and it will return a non-trivial factor of the number.
+
+How? Well, simple. There are a rew stepts that we need to follow:
+	1. For every k starting from 1 we take the integer part of the square root of k*n, which we will call it t0. 
+	2. Then, we check each if the number obtained satisfies the condition that t^2-k*n is a square, by incrementing it with 1 at each step until we find the desired number that satisfies the condition. 
+	3. When we finally find the number, we take the square root of it, that we will name it s. 
+	4. Now we have the non-trivial factor returned as as aproduct that looks like: 1/k(t+s)(t-s).
+
+Basically, he point of the generalized Fermat's algorithm is to find the non-trivial factor using as little incrementations as possible.
+
+
+Now, let's take an example in order to understand better the concept:
+
+Let n=141467
+
+t0 = [sqrt(n)] = 376
+
+t0+1 = 377: t^2 − n = 662 is not a square
+t0+2 = 378: t^2 − n = 1417 is not a square
+t0+3 = 377: t^2 − n = 2174 is not a square
+...
+t0+36 = 413: t^2 − n = 29102 is not a square
+t0+37 = 414: t^2 − n = 29929 = 173^2 = s^2 is a square => s=173
+
+So, n = (t + s)(t − s) = 587 · 241
+
+Now, let's take n=141467 and k=3
+
+t0=[sqrt(k*n)] = 651
+
+t0+1 = 651^2 - k*n - is not a square
+t0+2 = 652^2 - k*n - is not a square
+t0+3 = 653^2 - k*n - is not a square
+t0+4 = 654^2 - k*n - is not a square
+t0+5 = 655^2 - k*n = 4624 = 68^2 = s^2 is a square => s=68
+
+So, 3n = (t + s)(t − s) = 723 · 587 => n =  241 · 587
+
+As we can see, in the first algorithm we did 30 something computations in order to finally find a suitable square number, whereas in the second algorithm, the generalized one, there were only 5 computations needed to find the result.
+It is clear why we would choose the second one.
+
+
+Now, let's see how I chose to implement the algorithm using python accordingly with the algorithm presented at the course: 
+As input, we will have an odd composite number n and a bound. 
+As output, we will ge a non-trivial factor of n.
+Since we know that the algorithm is only applicable for odd positive numbers, it is demanding to do a little checking. So I did that. 
+First we have a boolean that is initially set to false - this one tells us if we found the desired numbers or not.
+Then, we have our k that is initially 1, q which is intially -1 and q which is iniatially -1 => I chose -1 because it is trivial and the very first thought if intialization for these variables. P and q represent the 2 factors of multiplication: p=(t-s) and q=(t+s). The algorithm goes while we did not find any factor that satisfies the condition, so every time we will compute the t0 which is sqrt(k*n). We compute B=t0+bound, which is the bound that tells us how far can we go and we check if n is the square of t0. If yes, we return a list of [t0,t0] representing the desired numbers.
+Furthermore, we loop from t0+1 to out B(bound) and at every step we compute the s squared which is t*t-k*n, then we check if it is a perfect square. If it is a perfect square, indeed, our s will be the square root of s2(s square), p will be t-s and q will be t+s. 
+Few more steps and we're done. 
+We check if n is indeed (p*q)/k and if it is, we have found our numbers, so the found boolean will be True now and we will return the 2 factors as a list: [p,q]
+
+If the loop finishes and we did not any numbers that satisfy us, we increment out k and we do that again. If the k is more that sqrt(n) the algorithm stops because there's no point in doing such thing.
+
+This is the algorithm:
+
+<<Fermat>>=
+def fermat(n, bound):
+    found = False
+    k = 1
+    p = -1
+    q = -1
+    if n <= 0:
+        return [n]
+    if (n & 1) == 0:
+        return [n / 2, 2]
+    while not found:
+        t0 = math.ceil(math.sqrt(k * n))
+        B = t0 + bound
+        if t0 * t0 == n:
+            return [t0, t0]
+        for t in range(t0 + 1, B):
+            s2 = t * t - k * n
+            if int(math.sqrt(s2)) == math.sqrt(s2):
+                s = math.sqrt(s2)
+                p = t - s
+                q = t + s
+                if n == (p * q) / k:
+                    p = (t - s)
+                    q = (t + s)
+                    found = True
+        if not found:
+            k += 1
+        if k > math.sqrt(n):
+            break
+        return [p, q]
+
+@
+
+
+Here we also have some tests for different numbers. I have also tested the algorithm for the well-known Mersenne numbers and it works as well.
+
+<<*>>=
+<<Fermat>>
+
+import math
+print("Fermat of 141467: " + str(fermat(141467, 40)))
+print("Fermat of 200819: " + str(fermat(200819,330)))
+print("Fermat of 17873: " + str(fermat(17873,100)))
+print("Fermat of 7635: " + str(fermat(7635,280)))
+print("Fermat of 736473: " + str(fermat(736473,390)))
+print("Fermat of 354673: " + str(fermat(354673, 2805)))
+print("Fermat of 7364723: " + str(fermat(7364723, 390)))
+
+
+@

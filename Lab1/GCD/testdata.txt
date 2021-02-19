@@ -1,0 +1,125 @@
+print("GCD1: ")
+print(datetime.datetime.now())
+print("gcd(60, 48): " + str(gcd1(60, 48)))
+print(datetime.datetime.now())
+
+print(datetime.datetime.now())
+print("gcd(52,70) : " + str(gcd1(52,70)))
+print(datetime.datetime.now())
+
+print(datetime.datetime.now())
+print("gcd(17,16): " + str(gcd1(17,16)))
+print(datetime.datetime.now())
+
+print(datetime.datetime.now())
+print("gcd(98, 8): " + str(gcd1(98, 8)))
+print(datetime.datetime.now())
+
+print(datetime.datetime.now())
+print("gcd(46,23) : " + str(gcd1(46,23)))
+print(datetime.datetime.now())
+
+print(datetime.datetime.now())
+print("gcd(52,15): " + str(gcd1(52,15)))
+print(datetime.datetime.now())
+
+print(datetime.datetime.now())
+print("gcd(112 48): " + str(gcd1(112, 48)))
+print(datetime.datetime.now())
+
+print(datetime.datetime.now())
+print("gcd(516,122) : " + str(gcd1(52,70)))
+print(datetime.datetime.now())
+
+print(datetime.datetime.now())
+print("gcd(788,134): " + str(gcd1(17,16)))
+print(datetime.datetime.now())
+
+print(datetime.datetime.now())
+print("gcd(1024,512): " + str(gcd1(1024,512)))
+print(datetime.datetime.now())
+
+
+
+print("GCD2: ")
+print(datetime.datetime.now())
+print("gcd(60, 48): " + str(gcd2(60, 48)))
+print(datetime.datetime.now())
+
+print(datetime.datetime.now())
+print("gcd(52,70) : " + str(gcd2(52,70)))
+print(datetime.datetime.now())
+
+print(datetime.datetime.now())
+print("gcd(17,16): " + str(gcd2(17,16)))
+print(datetime.datetime.now())
+
+print(datetime.datetime.now())
+print("gcd(98, 8): " + str(gcd2(98, 8)))
+print(datetime.datetime.now())
+
+print(datetime.datetime.now())
+print("gcd(46,23) : " + str(gcd2(46,23)))
+print(datetime.datetime.now())
+
+print(datetime.datetime.now())
+print("gcd(52,15): " + str(gcd2(52,15)))
+print(datetime.datetime.now())
+
+print(datetime.datetime.now())
+print("gcd(112 48): " + str(gcd2(112, 48)))
+print(datetime.datetime.now())
+
+print(datetime.datetime.now())
+print("gcd(516,122) : " + str(gcd2(52,70)))
+print(datetime.datetime.now())
+
+print(datetime.datetime.now())
+print("gcd(788,134): " + str(gcd1(17,16)))
+print(datetime.datetime.now())
+
+print(datetime.datetime.now())
+print("gcd(1024,512): " + str(gcd2(1024,512)))
+print(datetime.datetime.now())
+
+
+print("GCD3: ")
+print(datetime.datetime.now())
+print("gcd(60, 48): " + str(gcd3(60, "48")))
+print(datetime.datetime.now())
+
+print(datetime.datetime.now())
+print("gcd(52,70) : " + str(gcd3(52,"70")))
+print(datetime.datetime.now())
+
+print(datetime.datetime.now())
+print("gcd(17,16): " + str(gcd3(17, "16")))
+print(datetime.datetime.now())
+
+print(datetime.datetime.now())
+print("gcd(98, 8): " + str(gcd3(98, "8")))
+print(datetime.datetime.now())
+
+print(datetime.datetime.now())
+print("gcd(46,23) : " + str(gcd3(46, "23")))
+print(datetime.datetime.now())
+
+print(datetime.datetime.now())
+print("gcd(52,15): " + str(gcd3(52,"15")))
+print(datetime.datetime.now())
+
+print(datetime.datetime.now())
+print("gcd(112 48): " + str(gcd3(112, "48")))
+print(datetime.datetime.now())
+
+print(datetime.datetime.now())
+print("gcd(516,122) : " + str(gcd3(52, "70")))
+print(datetime.datetime.now())
+
+print(datetime.datetime.now())
+print("gcd(788,134): " + str(gcd3(17, "16")))
+print(datetime.datetime.now())
+
+print(datetime.datetime.now())
+print("gcd(124,523422345676543456354678987654312): " + str(gcd3(124,"523422345676543456354678987654312")))
+print(datetime.datetime.now())

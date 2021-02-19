@@ -1,0 +1,118 @@
+---
+format: markdown
+title: Laboratory2 - Carmichael numbers
+name: Catargiu Georgiana Ecaterina
+group: 932
+. . .
+
+Problem number: 7(26%10 = 6 + 1 =7)
+
+The purpose of my problem in this laboratory is to implement an lgorithm for determining all Carmichael numbers less than a given bound.
+
+First, let's see what the Carmichael numbers really are. So, a number n is said to be a Carmichael number if it satisfies the following condition: power(b, n-1) MOD n=1, for all b in range from 1 to n such that b and n are relatively prime: gcd(b, n) = 1 - the greatest common divisor between b and n must be 1. In less words, any Carmichael number needs to have at least 2 prime factors.
+
+Now let's take 2 examples.
+
+1). n=8 is not a Carmichael number because 3 is relatively prime to 8 and (3^(8-1)) % 8 = 2187 % 8 is not 1.
+2). n=561 is a Carmichael number because it satisfies the considions above. It is also the smallest Carmichael number.
+ 
+Interesting fact: the largest known Carmichael numbers having a given number of factors have that many digits:
+
+factors    digits 
+  3        60351
+  4	   29094
+  5	   1015
+  6	   19140
+
+
+Another approach to Carmichael numbers is the following: Carmichael number is an odd composite number n which satisfies Fermat's theorem.
+
+Now, to clear it up, an odd composite number is of course, an odd(duuuh) number which is not prime (which has factors other than 1 and itself).
+
+These kind of numbers are extremly rare.. in fact there are only 2163 such numbers less that 25*(10^9) and only 8241 ones smaller that 10^12.
+
+(IMPORTANT NOTE: here we consider that = represents the congruency sign with three orizontal lines one above the other - I could not find it at any means, sorry) 
+And about the Fermat's theorem it says something like that: If p is a prime number and a is a natural number, then a^p=a (mod p). 	
+Furthermore, if p does not divide a, then there exists some smallest exponent d such that a^d-1=0 (mod p) and d divides p-1. Hence, a^(p-1)-1=0 (mod p). 
+
+
+So, these being said, I chose to implement the algorithm for finding all the Carmichael numbers less that a given boud as follows:
+
+First, we need a little function that helps us to find the greatest common divisor between two numbers. I chose here the Euclidean algorithm with an auziliary variable.
+
+<<GCD>>=
+def gcd(x,y):
+	while(y!=0):
+		aux=y
+		y=x%y
+		x=aux
+	gcd=x
+	return gcd
+@
+
+
+Then, we definetely needed a function that check whether a number is indeed prime or not. For this I went very straightforward: if the number is less than 2 it is clear that it is not prime, and also if the number is even. Then we go from 3 to the squareroot of the number+1 with 2 steps at once and if the index that we are at in any moment divides out number, it certainly is not prime. If we reach the bound without any divisors, the number is prime.
+
+
+<<Check if prime>>=
+def isPrime(x):
+	if(x<=2):
+		return x==2
+	if(x%2==0):
+		return False
+	for d in range(3, int(x**0.5)+1,2):
+		if(x%d==0):
+			return False
+	return True
+@
+
+Almost there. Here we have a method that check is a given number is a Carmichael number of not. As descried above, we check is a number is less than 2 or is even of it is prime. Then we go with a for from 3 to x(our number), 2 steps at once and we check first if the greatest common divisor between the index that we are at and the x(our number) is 1. Then we use the pow built-in function in order to compute the modulus of the index that we are at at the power of x-1(our number - 1) and to check if it is different than 1. If it is different, the number is not a Carmichael number. Otherwise, it is. Yay
+
+
+<<Check if Carmichael>>=
+def isCarmichael(x):
+	if(x<=2 or x%2==0 or isPrime(x)):
+		return False
+	for i in range(3,x,2):
+		if(gcd(i,x)==1):
+			if(pow(i,x-1,x))!=1:
+				return False
+	return True
+@
+
+Here we take all the Carmichael numbers being given a bound. How do we do that? We simply take a for and we iterate throtuh all numbers before we reach that bound, we check if each index that we ar at in any moment is a Carmichael number and then we print it if it satisfyies the conditions.
+
+<<Get Carmichael Numbers>>=
+def getCarmichaelNumbers(max):
+	count = 0 
+	for i in range(max):
+		if isCarmichael(i):
+			count = count + 1
+			print(i)
+	print('Nr of Carmichael numbers less than ' + str(max) + ' is: ' + str(count))
+@
+
+Here is the main program in which we only call the above function in order to get all the Carmichael numbers when a boud is given. 
+
+<<*>>=
+
+<<GCD>>
+
+<<Check if prime>>
+
+<<Check if Carmichael>>
+
+<<Get Carmichael Numbers>>
+
+getCarmichaelNumbers(1000000)
+@
+
+
+
+
+
+
+
+
+
+

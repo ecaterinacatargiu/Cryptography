@@ -1,0 +1,107 @@
+---
+format: markdown
+title: Laboratory1 - GCD Three ways
+name: Catargiu Georgiana Ecaterina
+group: 932
+. . .
+
+The purpose of this laboratory was to implement 3 algorithms that will compute the GCD of two numers, one of them having to handle arbitrary size numbers.
+
+
+
+The first algoritm is the simplest one and the one learned in highshool many years ago. The GCD of two numbers, x and y will be a number between 1 and the smallest number +1. So, first we compare the two numbers, and we keep in mind the smallest one and then we iterate from 1 to the smallest+1 and every time we check whether both of our numbers are indeed divisible by the iteration index that we are at(by i).
+
+The complexity of the algorithm is O(n), where n will be the smallest number between the 2 given numbers.
+
+<<GCD First Algorithm>>=
+def gcd1(x,y):
+	if(x==y):
+		return x
+	else:
+		if(x>y):
+			small=y
+		else:
+			small=x
+	for i in range(1, small+1):
+		if((x%i==0) and (y%i==0)):
+			myGcd1=i
+	return myGcd1
+@
+
+
+
+The second algorithm choosen is the substraction method, based on the well known Euclidean algorithm. The algorithm is extremly simple: while the thoo given numbers are not equal, we are always checking which one is the bigger and then we substract from the biggest number,  the smaller one. 
+
+The complexity of this algorithm is again, O(n)
+
+<<GCD Second Algorithm>>=
+def gcd2(x,y):
+	while(x!=y):
+		if(x>y):
+			x=x-y
+		else:
+			y=y-x
+	return x
+@
+
+
+The third and the last algorithm is some variation of the Euclidean algorithm using a temporary variable named aux. So, while the number is different that 0, at each step we compute the modulo of the two given numbers and then we swap the 2 numbers. This algorithm also works for arbitrary size numbers, the time in which it computed the GCD being extremly small compared with the other ones.
+
+The complexity of this algorithm is also O(n).
+
+
+<<GCD Third Algorithm>>=
+def gcd3(x,y):
+	while(y!=0):
+		aux=y
+		y=x%y
+		x=aux
+	gcd=x
+	return gcd
+@
+
+<<*>>=
+<<GCD First Algorithm>>
+
+<<GCD Second Algorithm>>
+
+<<GCD Third Algorithm>>
+import datetime
+from time import time
+import random
+
+#Now we will compare the time in which each algorithm will compute the GCD for 2 random numbers and with a number of iterations.
+
+a=1
+b=10000
+iterations = 1000
+
+start= datetime.datetime.now()
+for i in range(iterations):
+	nr1=random.randint(a,b)
+	nr2=random.randint(a,b)
+	gcd1(a,b)
+end=datetime.datetime.now()
+print("First algorithm time:" + str(end-start))
+
+start= datetime.datetime.now()
+for i in range(iterations):
+	nr1=random.randint(a,b)
+	nr2=random.randint(a,b)
+	gcd2(a,b)
+end=datetime.datetime.now()
+print("Second algorithm time:" + str(end-start))
+
+
+start= datetime.datetime.now()
+for i in range(iterations):
+	nr1=random.randint(a,b)
+	nr2=random.randint(a,b)
+	gcd3(a,b)
+end=datetime.datetime.now()
+print("Third algorithm time:" + str(end-start))
+
+
+
+@
+
